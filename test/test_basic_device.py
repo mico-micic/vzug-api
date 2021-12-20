@@ -1,5 +1,5 @@
 import pytest
-from aiohttp import web, ClientConnectorError
+from aiohttp import web
 from aiohttp.test_utils import RawTestServer
 from tenacity import wait_none
 from vzug import const
