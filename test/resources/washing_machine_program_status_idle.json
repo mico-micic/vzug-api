@@ -1,0 +1,14 @@
+[
+  {
+    "status": "idle",
+    "fillLevelA": {
+      "act": "ok"
+    },
+    "fillLevelB": {
+      "act": "ok"
+    },
+    "hygiene": {
+      "act": false
+    }
+  }
+]

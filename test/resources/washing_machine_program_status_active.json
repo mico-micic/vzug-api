@@ -1,0 +1,29 @@
+[
+  {
+    "id": 3003,
+    "temp": {
+      "set": 40
+    },
+    "status": "active",
+    "name": "40°C Outdoor",
+    "duration": {
+      "set": 3840,
+      "act": 2217
+    },
+    "optiDos": {
+      "set": "detergentAandB"
+    },
+    "fillLevelA": {
+      "act": "ok"
+    },
+    "fillLevelB": {
+      "act": "ok"
+    },
+    "addWash": {
+      "act": false
+    },
+    "hygiene": {
+      "act": false
+    }
+  }
+]

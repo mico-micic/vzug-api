@@ -1,0 +1,12 @@
+{
+  "DeviceName": "TestDevice",
+  "Serial": "123",
+  "Inactive": "false",
+  "Program": "TestProgram",
+  "Status": "Testing",
+  "ProgramEnd": {
+    "End": "",
+    "EndType": "0"
+  },
+  "deviceUuid": "test-uuid"
+}
