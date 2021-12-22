@@ -40,10 +40,6 @@ class WashingMachine(BasicDevice):
         self._optidos_config = ""
         self._optidos_a_status = ""
         self._optidos_b_status = ""
-        self._power_consumption_kwh_total = 0.0
-        self._water_consumption_l_total = 0.0
-        self._power_consumption_kwh_avg = 0.0
-        self._water_consumption_l_avg = 0.0
 
     async def load_program_details(self) -> bool:
         """Load program details information by calling the corresponding API endpoint"""
@@ -106,7 +102,7 @@ class WashingMachine(BasicDevice):
     async def _do_consumption_details_request(self, command: str) -> str:
 
         url = self.get_command_url(ENDPOINT_HH, COMMAND_GET_COMMAND).update_query({'value': command})
-        eco_json = (await self.make_vzug_device_call_json(url))
+        eco_json = await self.make_vzug_device_call_json(url)
 
         if 'value' in eco_json:
             return eco_json['value']
