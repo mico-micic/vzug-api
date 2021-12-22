@@ -1,0 +1,6 @@
+{
+  "type": "status",
+  "description": "Gesamtverbrauch",
+  "command": "ecomXstatXtotal",
+  "value": " 29 kWh,  2119ℓ "
+}

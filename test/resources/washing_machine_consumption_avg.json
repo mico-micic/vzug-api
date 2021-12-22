@@ -1,0 +1,6 @@
+{
+  "type": "status",
+  "description": "Durchschnitt pro Charge",
+  "command": "ecomXstatXavarage",
+  "value": " 0,6 kWh,  37ℓ"
+}

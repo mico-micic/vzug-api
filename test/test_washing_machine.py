@@ -2,7 +2,8 @@ import pytest
 from aiohttp import web
 from aiohttp.test_utils import RawTestServer
 from tenacity import wait_none
-from vzug import BasicDevice, WashingMachine, const
+from vzug import BasicDevice, WashingMachine, const, DeviceError
+from vzug.washing_machine import COMMAND_VALUE_ECOM_STAT_TOTAL, COMMAND_VALUE_ECOM_STAT_AVG
 from .util import get_test_response_from_file
 
 import logconf
@@ -27,6 +28,19 @@ async def device_program_idle_handler(request: web.BaseRequest):
         return 'WRONG REQUEST'
 
 
+async def consumption_ok_handler(request: web.BaseRequest):
+    if const.COMMAND_GET_COMMAND in request.path_qs and COMMAND_VALUE_ECOM_STAT_AVG in request.path_qs:
+        return get_test_response_from_file('washing_machine_consumption_avg.json')
+    elif const.COMMAND_GET_COMMAND in request.path_qs and COMMAND_VALUE_ECOM_STAT_TOTAL in request.path_qs:
+        return get_test_response_from_file('washing_machine_consumption_total.json')
+    else:
+        return 'WRONG REQUEST'
+
+
+async def consumption_err_handler(request: web.BaseRequest):
+    return get_test_response_from_file('washing_machine_consumption_err.json')
+
+
 @pytest.fixture
 async def server_prog_active(aiohttp_raw_server, aiohttp_unused_port) -> BasicDevice:
     return await aiohttp_raw_server(device_program_active_handler, port=aiohttp_unused_port())
@@ -35,6 +49,16 @@ async def server_prog_active(aiohttp_raw_server, aiohttp_unused_port) -> BasicDe
 @pytest.fixture
 async def server_prog_idle(aiohttp_raw_server, aiohttp_unused_port) -> BasicDevice:
     return await aiohttp_raw_server(device_program_idle_handler, port=aiohttp_unused_port())
+
+
+@pytest.fixture
+async def server_consumption_ok(aiohttp_raw_server, aiohttp_unused_port) -> BasicDevice:
+    return await aiohttp_raw_server(consumption_ok_handler, port=aiohttp_unused_port())
+
+
+@pytest.fixture
+async def server_consumption_err(aiohttp_raw_server, aiohttp_unused_port) -> BasicDevice:
+    return await aiohttp_raw_server(consumption_err_handler, port=aiohttp_unused_port())
 
 
 async def test_program_information_active(server_prog_active: RawTestServer):
@@ -68,3 +92,24 @@ async def test_program_information_wrong_address():
     assert active is False
     assert device.error_code == "n/a"
     assert isinstance(device.error_exception.inner_exception, IOError)
+
+
+async def test_consumption_information(server_consumption_ok: RawTestServer):
+    device = WashingMachine(server_consumption_ok.host + ":" + str(server_consumption_ok.port))
+    loaded = await device.load_consumption_data()
+
+    assert loaded is True
+    assert device.power_consumption_kwh_total == 29.0
+    assert device.power_consumption_kwh_avg == 0.6
+    assert device.water_consumption_l_total == 2119.0
+    assert device.water_consumption_l_avg == 37.0
+
+
+async def test_consumption_wrong_data(server_consumption_err: RawTestServer):
+    device = WashingMachine(server_consumption_err.host + ":" + str(server_consumption_err.port))
+    loaded = await device.load_consumption_data()
+
+    assert loaded is False
+    assert device.error_code == "n/a"
+    assert len(device.error_message) > 0
+    assert isinstance(device.error_exception, DeviceError)

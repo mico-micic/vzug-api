@@ -1,0 +1,6 @@
+{
+  "type": "status",
+  "description": "Gesamtverbrauch",
+  "command": "ecomXstatXtotal",
+  "value": "some wrong data"
+}
