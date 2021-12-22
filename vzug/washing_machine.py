@@ -40,10 +40,10 @@ class WashingMachine(BasicDevice):
         self._optidos_config = ""
         self._optidos_a_status = ""
         self._optidos_b_status = ""
-        self._power_consumption_kwh_total = 0
-        self._water_consumption_l_total = 0
-        self._power_consumption_kwh_avg = 0
-        self._water_consumption_l_avg = 0
+        self._power_consumption_kwh_total = 0.0
+        self._water_consumption_l_total = 0.0
+        self._power_consumption_kwh_avg = 0.0
+        self._water_consumption_l_avg = 0.0
 
     async def load_program_details(self) -> bool:
         """Load program details information by calling the corresponding API endpoint"""
