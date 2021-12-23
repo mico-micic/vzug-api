@@ -6,9 +6,6 @@ from vzug import BasicDevice, WashingMachine, const, DeviceError
 from vzug.washing_machine import COMMAND_VALUE_ECOM_STAT_TOTAL, COMMAND_VALUE_ECOM_STAT_AVG
 from .util import get_test_response_from_file
 
-import logconf
-
-logconf.setup_logging()
 
 # Disable retry wait time for better test performance
 BasicDevice.make_vzug_device_call_json.retry.wait = wait_none()

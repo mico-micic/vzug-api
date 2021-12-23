@@ -18,8 +18,8 @@ REGEX_MATCH_KWH = r"(\d+(?:[\,\.]\d+)?).?kWh"
 class WashingMachine(BasicDevice):
     """Class representing V-Zug washing machines"""
 
-    def __init__(self, host: str):
-        super().__init__(host)
+    def __init__(self, host: str, username: str = "", password: str = ""):
+        super().__init__(host, username, password)
         self._seconds_to_end = 0
         self._program_name = ""
         self._program_status = ""

@@ -5,10 +5,7 @@ from tenacity import wait_none
 from vzug import const
 
 from vzug import BasicDevice
-import logconf
 from .util import get_test_response_from_file
-
-logconf.setup_logging()
 
 # Disable retry wait time for better test performance
 BasicDevice.make_vzug_device_call_json.retry.wait = wait_none()
