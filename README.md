@@ -6,7 +6,7 @@
 
 * Any V-ZUG device with network support:
   * Get basic status information.
-  * Support username / password authentication.
+  * Support username / password authentication (not tested yet).
 
 * Washing machines:
   * Get power and water consumption data.

@@ -7,6 +7,13 @@ from .const import (COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC, ENDPOINT_AI)
 from yarl import URL
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type, before_log
 
+from .digest_auth import DigestAuth
+
+REQUEST_HEADERS = {
+    "User-Agent": f"vzug-lib/0.1",
+    "Accept": f"application/json, text/plain, */*",
+}
+
 
 class DeviceError(Exception):
     def __init__(self, message, err_code: str, inner_exception: Exception = None):
@@ -31,8 +38,10 @@ class DeviceError(Exception):
 class BasicDevice:
     """Class containing basic functions valid to any V-ZUG device"""
 
-    def __init__(self, host: str) -> None:
+    def __init__(self, host: str, username: str = "", password: str = "") -> None:
         self._host = host
+        self._username = username
+        self._password = password
         self._serial = ""
         self._model_desc = ""
         self._device_name = ""
@@ -61,11 +70,13 @@ class BasicDevice:
         async with aiohttp.ClientSession() as session:
             try:
                 self._logger.debug("Raw service call URL: %s", str(url))
-                async with session.get(url) as resp:
-                    txt_resp = await resp.read()
-                    self._logger.debug("Raw response from %s: status %s, content: %s",
-                                       self._host, resp.status, txt_resp)
-                    return txt_resp.decode("utf-8")
+
+                auth = DigestAuth(self._username, self._password, session)
+                resp = await auth.request('GET', url=url, headers=REQUEST_HEADERS)
+
+                txt_resp = await resp.read()
+                self._logger.debug("Raw response from %s: status %s, text: %s", self._host, resp.status, txt_resp)
+                return txt_resp.decode("utf-8")
 
             except IOError as e:
                 err_msg = "IOError while calling device API"

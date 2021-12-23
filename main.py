@@ -11,6 +11,9 @@ async def main():
    # await device.load_device_information()
 
     device = WashingMachine("192.168.0.202")
+    await device.load_program_details()
+
+    device = WashingMachine("192.168.0.202")
     await device.load_consumption_data()
 
 if __name__ == '__main__':
