@@ -3,14 +3,14 @@ import json
 
 import aiohttp
 import logging
-from .const import (COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC, ENDPOINT_AI)
+from .const import (COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC, ENDPOINT_AI, VERSION)
 from yarl import URL
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type, before_log
 
 from .digest_auth import DigestAuth
 
 REQUEST_HEADERS = {
-    "User-Agent": f"vzug-lib/0.1",
+    f"User-Agent": f"vzug-lib/{VERSION}",
     "Accept": f"application/json, text/plain, */*",
 }
 

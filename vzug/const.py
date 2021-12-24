@@ -1,3 +1,5 @@
+VERSION = '0.0.1'
+
 ENDPOINT_AI = 'ai'
 ENDPOINT_HH = 'hh'
 COMMAND_GET_STATUS = 'getDeviceStatus'
