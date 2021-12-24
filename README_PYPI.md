@@ -16,4 +16,4 @@
 Since I have only one V-ZUG machine (AdoraWash V4000), the library is not tested with other devices.
 
 ## How to use
-Check [examples/](https://github.com/mico-micic/vzug-api/tree/main/examples) directory for implementations.
+Check [examples (github.com)](https://github.com/mico-micic/vzug-api/tree/main/examples) directory for implementations.
