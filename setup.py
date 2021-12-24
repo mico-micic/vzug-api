@@ -1,24 +1,39 @@
 import os
 from setuptools import setup, find_packages
 
-here = os.path.abspath(os.path.dirname(__file__))
+HERE = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(here, "README.md"), encoding="utf-8") as readme:
-    long_description = readme.read()
+with open(os.path.join(HERE, "README.md"), encoding="utf-8") as readme:
+    long_desc = readme.read()
 
 setup(
     name='vzug-api',
-    description='V-ZUG API library',
     version='0.0.1',
-    packages=find_packages(),
+    description='Unofficial python API for V-ZUG devices',
+    long_description=long_desc,
+    long_description_content_type="text/markdown",
+    url='https://github.com/mico-micic/vzug-api',
+    author='Mićo Mićić',
+    author_email='mico@micic.ch',
+    license='GNU General Public License v3.0',
+    packages=find_packages(exclude=("test", "examples")),
+    include_package_data=True,
     install_requires=[
         'aiohttp>=3.8.0',
         'tenacity>=8.0.0',
         'yarl>=1.7.0'
     ],
     tests_require=['pytest'],
-    url='',
-    license='GNU General Public License v3.0',
-    author='Mico Micic',
-    author_email='mico@micic.ch'
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Environment :: Console",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+        "Operating System :: POSIX :: Linux",
+        "Operating System :: MacOS :: MacOS X",
+        "Operating System :: Microsoft :: Windows",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.8",
+        "Topic :: Home Automation",
+    ],
 )
