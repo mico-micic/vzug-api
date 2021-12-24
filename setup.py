@@ -16,7 +16,7 @@ setup(
     author='Mićo Mićić',
     author_email='mico@micic.ch',
     license='GNU General Public License v3.0',
-    packages=find_packages(exclude=("test", "examples")),
+    packages=find_packages(exclude=["test", "examples"]),
     include_package_data=True,
     install_requires=[
         'aiohttp>=3.8.0',
