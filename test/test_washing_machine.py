@@ -19,7 +19,7 @@ async def device_all_information_handler(request: web.BaseRequest):
     elif const.COMMAND_GET_PROGRAM in request.path_qs:
         return get_test_response_from_file('washing_machine_program_status_active.json')
     else:
-        return 'WRONG REQUEST'
+        return await consumption_ok_handler(request)
 
 
 async def device_program_active_handler(request: web.BaseRequest):
@@ -92,6 +92,11 @@ async def test_all_information(server_all_information: RawTestServer):
     assert device.optidos_active is True
     assert device.optidos_b_status == "ok"
     assert device.optidos_b_status == "ok"
+
+    assert device.power_consumption_kwh_total == 29.0
+    assert device.power_consumption_kwh_avg == 0.6
+    assert device.water_consumption_l_total == 2119.0
+    assert device.water_consumption_l_avg == 37.0
 
 
 async def test_program_information_active(server_prog_active: RawTestServer):
