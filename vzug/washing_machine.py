@@ -41,6 +41,14 @@ class WashingMachine(BasicDevice):
         self._optidos_a_status = ""
         self._optidos_b_status = ""
 
+    async def load_all_information(self) -> bool:
+        """If a program is active load additional program details"""
+        loaded = await super().load_all_information()
+        if loaded and self.is_active:
+            loaded = await self.load_program_details()
+
+        return loaded
+
     async def load_program_details(self) -> bool:
         """Load program details information by calling the corresponding API endpoint"""
 

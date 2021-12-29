@@ -11,6 +11,17 @@ from .util import get_test_response_from_file
 BasicDevice.make_vzug_device_call_json.retry.wait = wait_none()
 
 
+async def device_all_information_handler(request: web.BaseRequest):
+    if const.COMMAND_GET_STATUS in request.path_qs:
+        return get_test_response_from_file('device_status_ok_resp.json')
+    elif const.COMMAND_GET_MODEL_DESC in request.path_qs:
+        return web.Response(text='TestModel')
+    elif const.COMMAND_GET_PROGRAM in request.path_qs:
+        return get_test_response_from_file('washing_machine_program_status_active.json')
+    else:
+        return 'WRONG REQUEST'
+
+
 async def device_program_active_handler(request: web.BaseRequest):
     if const.COMMAND_GET_PROGRAM in request.path_qs:
         return get_test_response_from_file('washing_machine_program_status_active.json')
@@ -44,6 +55,11 @@ async def server_prog_active(aiohttp_raw_server, aiohttp_unused_port) -> BasicDe
 
 
 @pytest.fixture
+async def server_all_information(aiohttp_raw_server, aiohttp_unused_port) -> BasicDevice:
+    return await aiohttp_raw_server(device_all_information_handler, port=aiohttp_unused_port())
+
+
+@pytest.fixture
 async def server_prog_idle(aiohttp_raw_server, aiohttp_unused_port) -> BasicDevice:
     return await aiohttp_raw_server(device_program_idle_handler, port=aiohttp_unused_port())
 
@@ -56,6 +72,26 @@ async def server_consumption_ok(aiohttp_raw_server, aiohttp_unused_port) -> Basi
 @pytest.fixture
 async def server_consumption_err(aiohttp_raw_server, aiohttp_unused_port) -> BasicDevice:
     return await aiohttp_raw_server(consumption_err_handler, port=aiohttp_unused_port())
+
+
+async def test_all_information(server_all_information: RawTestServer):
+    device = WashingMachine(server_all_information.host + ":" + str(server_all_information.port))
+    loaded = await device.load_all_information()
+
+    assert loaded is True
+    assert device.device_name == "TestDevice"
+    assert device.serial == "123"
+    assert device.status == "Testing"
+    assert device.program == "TestProgram"
+    assert device.uuid == "test-uuid"
+    assert device.model_desc == "TestModel"
+    assert device.is_active is True
+
+    assert device.program_status == "active"
+    assert device.program_name == "40°C Outdoor"
+    assert device.optidos_active is True
+    assert device.optidos_b_status == "ok"
+    assert device.optidos_b_status == "ok"
 
 
 async def test_program_information_active(server_prog_active: RawTestServer):

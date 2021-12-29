@@ -57,6 +57,20 @@ async def test_device_information_ok(server_ok: RawTestServer):
     assert device.is_active is True
 
 
+async def test_device_all_information(server_ok: RawTestServer):
+    device = BasicDevice(server_ok.host + ":" + str(server_ok.port))
+    loaded = await device.load_all_information()
+
+    assert loaded is True
+    assert device.device_name == "TestDevice"
+    assert device.serial == "123"
+    assert device.status == "Testing"
+    assert device.program == "TestProgram"
+    assert device.uuid == "test-uuid"
+    assert device.model_desc == "TestModel"
+    assert device.is_active is True
+
+
 async def test_device_information_error(server_err: RawTestServer):
     device = BasicDevice(server_err.host + ":" + str(server_err.port))
     loaded = await device.load_device_information()

@@ -110,6 +110,14 @@ class BasicDevice:
             self._logger.error("%s: %s", err_msg, str(e))
             raise DeviceError(err_msg, "n/a", e)
 
+    async def load_all_information(self) -> bool:
+        """
+        For the basic device forward the call to load_device_information().
+        Method can be overridden by subclasses to load device specific
+        information.
+        """
+        return await self.load_device_information()
+
     async def load_device_information(self) -> bool:
         """Load device status information by calling the corresponding API endpoint"""
 
