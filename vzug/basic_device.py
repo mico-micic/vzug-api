@@ -3,7 +3,8 @@ import json
 
 import aiohttp
 import logging
-from .const import (COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC, ENDPOINT_AI, VERSION)
+from .const import (COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC, ENDPOINT_AI, VERSION, DEVICE_TYPE_UNKNOWN,
+                    DEVICE_TYPE_WASHING_MACHINE, MODEL_MATCH_WASHING_MACHINE)
 from yarl import URL
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type, before_log
 
@@ -54,6 +55,7 @@ class BasicDevice:
         self._uuid = ""
         self._active = False
         self._device_information_loaded = False
+        self._device_type = DEVICE_TYPE_UNKNOWN
         self._logger = logging.getLogger(__name__)
 
     def get_base_url(self) -> URL:
@@ -138,10 +140,11 @@ class BasicDevice:
             self._model_desc = await self.make_vzug_device_call_raw(
                 self.get_command_url(ENDPOINT_AI, COMMAND_GET_MODEL_DESC))
 
+            self._set_device_type(self._model_desc)
             self._device_information_loaded = True
 
-            self._logger.info("Go device information. Model: %s, Serial: %s, Uuid: %s, name: %s, Status text: %s",
-                              self._model_desc, self._serial, self._uuid, self._device_name, self._status)
+            self._logger.info("Go device information. Type: %s, model: %s, serial: %s, uuid: %s, name: %s, status: %s",
+                              self.device_type, self.model_desc, self.serial, self.uuid, self.device_name, self.status)
             return True
 
         except DeviceError as e:
@@ -149,6 +152,12 @@ class BasicDevice:
             self._error_message = e.message
             self._error_exception = e
             return False
+
+    def _set_device_type(self, device_model: str) -> None:
+        if MODEL_MATCH_WASHING_MACHINE in device_model.lower():
+            self._device_type = DEVICE_TYPE_WASHING_MACHINE
+        else:
+            self._device_type = DEVICE_TYPE_UNKNOWN
 
     @property
     def serial(self) -> str:
@@ -193,6 +202,10 @@ class BasicDevice:
     @property
     def device_information_loaded(self) -> bool:
         return self._device_information_loaded
+
+    @property
+    def device_type(self) -> bool:
+        return self._device_type
 
     @property
     def uuid(self) -> str:

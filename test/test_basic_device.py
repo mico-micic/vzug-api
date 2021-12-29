@@ -4,7 +4,7 @@ from aiohttp.test_utils import RawTestServer
 from tenacity import wait_none
 from vzug import const
 
-from vzug import BasicDevice
+from vzug import BasicDevice, DEVICE_TYPE_WASHING_MACHINE
 from .util import get_test_response_from_file
 
 # Disable retry wait time for better test performance
@@ -15,7 +15,7 @@ async def device_status_ok_handler(request: web.BaseRequest):
     if const.COMMAND_GET_STATUS in request.path_qs:
         return get_test_response_from_file('device_status_ok_resp.json')
     elif const.COMMAND_GET_MODEL_DESC in request.path_qs:
-        return web.Response(text='TestModel')
+        return web.Response(text='AdoraWash V4000')
     else:
         return 'WRONG REQUEST'
 
@@ -53,8 +53,9 @@ async def test_device_information_ok(server_ok: RawTestServer):
     assert device.status == "Testing"
     assert device.program == "TestProgram"
     assert device.uuid == "test-uuid"
-    assert device.model_desc == "TestModel"
+    assert device.model_desc == "AdoraWash V4000"
     assert device.is_active is True
+    assert device.device_type is DEVICE_TYPE_WASHING_MACHINE
 
 
 async def test_device_all_information(server_ok: RawTestServer):
@@ -67,8 +68,9 @@ async def test_device_all_information(server_ok: RawTestServer):
     assert device.status == "Testing"
     assert device.program == "TestProgram"
     assert device.uuid == "test-uuid"
-    assert device.model_desc == "TestModel"
+    assert device.model_desc == "AdoraWash V4000"
     assert device.is_active is True
+    assert device.device_type is DEVICE_TYPE_WASHING_MACHINE
 
 
 async def test_device_information_error(server_err: RawTestServer):
