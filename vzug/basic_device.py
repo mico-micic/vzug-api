@@ -143,7 +143,7 @@ class BasicDevice:
             self._set_device_type(self._model_desc)
             self._device_information_loaded = True
 
-            self._logger.info("Go device information. Type: %s, model: %s, serial: %s, uuid: %s, name: %s, status: %s",
+            self._logger.info("Got device information. Type: %s, model: %s, serial: %s, uuid: %s, name: %s, status: %s",
                               self.device_type, self.model_desc, self.serial, self.uuid, self.device_name, self.status)
             return True
 
