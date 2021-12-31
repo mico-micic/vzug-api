@@ -196,7 +196,10 @@ class WashingMachine(BasicDevice):
         return self._seconds_to_end
 
     @property
-    def date_time_end(self, tz=None) -> datetime:
+    def date_time_end(self) -> datetime:
+        return datetime.now() + timedelta(seconds=self.seconds_to_end)
+
+    def get_date_time_end(self, tz=None) -> datetime:
         return datetime.now(tz) + timedelta(seconds=self.seconds_to_end)
 
     @property
