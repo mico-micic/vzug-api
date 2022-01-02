@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from distutils.util import strtobool
 import json
+from typing import Optional, Any, Dict
 
 import aiohttp
 import logging
@@ -32,7 +35,7 @@ class DeviceError(Exception):
         return self._message
 
     @property
-    def inner_exception(self) -> Exception:
+    def inner_exception(self) -> Exception | None:
         return self._inner_exception
 
 
@@ -47,11 +50,11 @@ class BasicDevice:
         self._model_desc = ""
         self._device_name = ""
         self._status = ""
-        self._status_json = json
+        self._status_json: Dict[Any, Any]
         self._program = ""
         self._error_code = ""
         self._error_message = ""
-        self._error_exception = None
+        self._error_exception: Optional[DeviceError] = None
         self._uuid = ""
         self._active = False
         self._device_information_loaded = False
@@ -90,7 +93,7 @@ class BasicDevice:
            retry=retry_if_exception_type(DeviceError),
            before=before_log(logging.getLogger(__name__), logging.DEBUG),
            reraise=True)
-    async def make_vzug_device_call_json(self, url: URL) -> json:
+    async def make_vzug_device_call_json(self, url: URL) -> Dict:
         """
         Make service call for any V-Zug device and check if there is an error code in json response.
         Sometimes the devices returns an internal error (like 503). In this case DeviceError exception
@@ -176,7 +179,7 @@ class BasicDevice:
         return self._status
 
     @property
-    def status_json(self) -> json:
+    def status_json(self) -> Any:
         return self._status_json
 
     @property
@@ -196,7 +199,7 @@ class BasicDevice:
         return self._error_message
 
     @property
-    def error_exception(self) -> DeviceError:
+    def error_exception(self) -> Optional[DeviceError]:
         return self._error_exception
 
     @property
@@ -204,7 +207,7 @@ class BasicDevice:
         return self._device_information_loaded
 
     @property
-    def device_type(self) -> bool:
+    def device_type(self) -> str:
         return self._device_type
 
     @property

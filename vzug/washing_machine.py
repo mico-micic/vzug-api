@@ -1,6 +1,8 @@
 import json
 
 import re
+from typing import Dict, Any
+
 from .basic_device import BasicDevice, DeviceError
 from datetime import datetime, timedelta
 from .const import ENDPOINT_HH, COMMAND_GET_PROGRAM, COMMAND_GET_COMMAND
@@ -92,7 +94,7 @@ class WashingMachine(BasicDevice):
             self._error_exception = e
             return False
 
-    def _read_optidos_details(self, program_json: json) -> None:
+    def _read_optidos_details(self, program_json: Dict[Any, Any]) -> None:
         """Read optiDos information from given program response"""
 
         self._optidos_a_status = ""
@@ -170,14 +172,14 @@ class WashingMachine(BasicDevice):
     def _read_liter_from_string(self, consumption_value: str) -> float:
         liter = self._read_float_from_string(consumption_value, REGEX_MATCH_LITER)
         if liter < 0:
-            raise DeviceError('Cannot find liter value in string %s'.format(consumption_value), 'n/a')
+            raise DeviceError('Cannot find liter value in string {0}'.format(consumption_value), 'n/a')
 
         return liter
 
     def _read_kwh_from_string(self, consumption_value: str) -> float:
         kwh = self._read_float_from_string(consumption_value, REGEX_MATCH_KWH)
         if kwh < 0:
-            raise DeviceError('Cannot find kWh value in string %s'.format(consumption_value), 'n/a')
+            raise DeviceError('Cannot find kWh value in string {0}'.format(consumption_value), 'n/a')
 
         return kwh
 
