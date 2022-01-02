@@ -91,7 +91,7 @@ async def test_all_information(server_all_information: RawTestServer):
     assert device.program_status == "active"
     assert device.program_name == "40°C Outdoor"
     assert device.optidos_active is True
-    assert device.optidos_b_status == "ok"
+    assert device.optidos_a_status == "ok"
     assert device.optidos_b_status == "ok"
 
     assert device.power_consumption_kwh_total == 29.0
@@ -108,7 +108,7 @@ async def test_program_information_active(server_prog_active: RawTestServer):
     assert device.program_status == "active"
     assert device.program_name == "40°C Outdoor"
     assert device.optidos_active is True
-    assert device.optidos_b_status == "ok"
+    assert device.optidos_a_status == "ok"
     assert device.optidos_b_status == "ok"
 
 
@@ -120,7 +120,7 @@ async def test_program_information_idle(server_prog_idle: RawTestServer):
     assert device.program_status == "idle"
     assert device.program_name == ""
     assert device.optidos_active is False
-    assert device.optidos_b_status == "ok"
+    assert device.optidos_a_status == "ok"
     assert device.optidos_b_status == "ok"
 
 

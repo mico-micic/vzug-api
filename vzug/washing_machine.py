@@ -32,14 +32,12 @@ class WashingMachine(BasicDevice):
         self._power_consumption_kwh_avg = 0.0
         self._water_consumption_l_avg = 0.0
 
-    def _reset_program_information(self) -> None:
+    def _reset_active_program_information(self) -> None:
         self._seconds_to_end = 0
         self._program_name = ""
         self._program_status = ""
         self._optidos_active = False
         self._optidos_config = ""
-        self._optidos_a_status = ""
-        self._optidos_b_status = ""
 
     async def load_all_information(self) -> bool:
         """Load consumption data and if a program is active load also the program details"""
@@ -48,15 +46,20 @@ class WashingMachine(BasicDevice):
             loaded = await self.load_consumption_data()
             if loaded and self.is_active:
                 loaded = await self.load_program_details()
+            else:
+                # If no program is active only load the optiDos data. (Use same function because the optiDos
+                # information is returned on the active program endpoint)
+                loaded = await self.load_program_details(True)
 
         return loaded
 
-    async def load_program_details(self) -> bool:
+    async def load_program_details(self, opti_dos_only: bool = False) -> bool:
         """Load program details information by calling the corresponding API endpoint"""
 
         self._logger.info("Loading program information for %s", self._host)
 
-        self._reset_program_information()
+        self._reset_active_program_information()
+
         try:
             program_json = (await self.make_vzug_device_call_json(
                 self.get_command_url(ENDPOINT_HH, COMMAND_GET_PROGRAM)))[0]
@@ -66,6 +69,10 @@ class WashingMachine(BasicDevice):
             # Load optiDos detailed information if optiDos is available / active
             # (optiDos may be available even if no program is active...)
             self._read_optidos_details(program_json)
+
+            # Skip if only die optiDos data should be loaded
+            if opti_dos_only:
+                return True
 
             if 'active' not in self._program_status:
                 self._logger.info("No program information available because no program is active")
@@ -87,6 +94,9 @@ class WashingMachine(BasicDevice):
 
     def _read_optidos_details(self, program_json: json) -> None:
         """Read optiDos information from given program response"""
+
+        self._optidos_a_status = ""
+        self._optidos_b_status = ""
 
         if 'fillLevelA' in program_json:
             self._optidos_a_status = program_json['fillLevelA']['act']
