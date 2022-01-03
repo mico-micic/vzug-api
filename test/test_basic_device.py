@@ -8,7 +8,7 @@ from vzug import BasicDevice, DEVICE_TYPE_WASHING_MACHINE
 from .util import get_test_response_from_file
 
 # Disable retry wait time for better test performance
-BasicDevice.make_vzug_device_call_json.retry.wait = wait_none()
+BasicDevice.make_vzug_device_call_json.retry.wait = wait_none()  # type: ignore
 
 
 async def device_status_ok_handler(request: web.BaseRequest):
@@ -87,7 +87,7 @@ async def test_device_information_invalid(server_invalid: RawTestServer):
 
     assert loaded is False
     assert device.error_code == "n/a"
-    assert isinstance(device.error_exception.inner_exception, ValueError)
+    assert isinstance(device.error_exception is not None and device.error_exception.inner_exception, ValueError)
 
 
 async def test_device_information_wrong_address():
