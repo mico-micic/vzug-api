@@ -23,7 +23,7 @@ setup(
         'tenacity>=8.0.0',
         'yarl>=1.7.0'
     ],
-    tests_require=['pytest'],
+    tests_require=['pytest', 'flask', 'flask_httpauth', 'Flask-Testing'],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",

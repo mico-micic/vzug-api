@@ -43,6 +43,10 @@ class DeviceError(Exception):
     def inner_exception(self) -> Exception | None:
         return self._inner_exception
 
+    @property
+    def is_auth_problem(self) -> bool:
+        return isinstance(self.inner_exception, DeviceAuthError)
+
 
 class BasicDevice:
     """Class containing basic functions valid to any V-ZUG device"""
@@ -68,7 +72,7 @@ class BasicDevice:
         self._auth_previous: Dict[str, str] = {}
 
     def get_base_url(self) -> URL:
-        return URL.build(scheme='http', host=self._host)
+        return URL.build(scheme='http', host=self._host.replace("http://", ""))
 
     def get_command_url(self, endpoint: str, command: str) -> URL:
         return self.get_base_url().join(URL(endpoint)).update_query({'command': command})
@@ -91,7 +95,9 @@ class BasicDevice:
                 }
 
                 if aiohttp.web.HTTPUnauthorized.status_code == resp.status:
-                    raise DeviceAuthError
+                    err_msg = "Authentication problem occurred while calling device API"
+                    self._logger.error(err_msg)
+                    raise DeviceError(err_msg, "n/a", DeviceAuthError())
 
                 txt_resp = await resp.read()
                 self._logger.debug("Raw response from %s: status %s, text: %s", self._host, resp.status, txt_resp)

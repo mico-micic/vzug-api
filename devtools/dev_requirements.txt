@@ -5,3 +5,6 @@ twine
 mypy
 pre-commit
 flake8
+flask
+flask_httpauth
+Flask-Testing
