@@ -5,6 +5,7 @@ import json
 from typing import Optional, Any, Dict
 
 import aiohttp
+import aiohttp.web
 import logging
 from .const import (COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC, ENDPOINT_AI, VERSION, DEVICE_TYPE_UNKNOWN,
                     DEVICE_TYPE_WASHING_MACHINE, MODEL_MATCH_WASHING_MACHINE)
@@ -17,6 +18,10 @@ REQUEST_HEADERS = {
     f"User-Agent": f"vzug-lib/{VERSION}",
     "Accept": f"application/json, text/plain, */*",
 }
+
+
+class DeviceAuthError(Exception):
+    """Exception thrown if there is an authentication problem."""
 
 
 class DeviceError(Exception):
@@ -50,7 +55,7 @@ class BasicDevice:
         self._model_desc = ""
         self._device_name = ""
         self._status = ""
-        self._status_json: Dict[Any, Any]
+        self._status_json: Dict[Any, Any] = {}
         self._program = ""
         self._error_code = ""
         self._error_message = ""
@@ -60,6 +65,7 @@ class BasicDevice:
         self._device_information_loaded = False
         self._device_type = DEVICE_TYPE_UNKNOWN
         self._logger = logging.getLogger(__name__)
+        self._auth_previous: Dict[str, str] = {}
 
     def get_base_url(self) -> URL:
         return URL.build(scheme='http', host=self._host)
@@ -76,8 +82,16 @@ class BasicDevice:
             try:
                 self._logger.debug("Raw service call URL: %s", str(url))
 
-                auth = DigestAuth(self._username, self._password, session)
+                auth = DigestAuth(self._username, self._password, session, self._auth_previous)
                 resp = await auth.request('GET', url=url, headers=REQUEST_HEADERS)
+                self._auth_previous = {
+                  'nonce_count': auth.nonce_count,
+                  'last_nonce': auth.last_nonce,
+                  'challenge': auth.challenge,
+                }
+
+                if aiohttp.web.HTTPUnauthorized.status_code == resp.status:
+                    raise DeviceAuthError
 
                 txt_resp = await resp.read()
                 self._logger.debug("Raw response from %s: status %s, text: %s", self._host, resp.status, txt_resp)

@@ -1,0 +1,7 @@
+pytest
+pytest-aiohttp
+bumpversion
+twine
+mypy
+pre-commit
+flake8

@@ -21,6 +21,7 @@ class DigestAuth:
         self.nonce_count = previous.get('nonce_count', 0)
         self.challenge = previous.get('challenge')
         self.args = {}
+        self.digest_auth_tried = False
         self.session = session
 
     async def request(self, method, url, *, headers=None, **kwargs):
@@ -46,7 +47,8 @@ class DigestAuth:
 
         # Only try performing digest authentication if the response status is
         # from 400 to 500.
-        if 400 <= response.status < 500:
+        if 400 <= response.status < 500 and self.digest_auth_tried is False:
+            self.digest_auth_tried = True
             return await self._handle_401(response)
 
         return response
@@ -139,7 +141,7 @@ class DigestAuth:
         Takes the given response and tries digest-auth, if needed.
         :rtype: ClientResponse
         """
-        auth_header = response.headers.get('www-authenticate', '')
+        auth_header = response.headers.get('WWW-Authenticate', '')
 
         parts = auth_header.split(' ', 1)
         if 'digest' == parts[0].lower() and len(parts) > 1:
@@ -166,11 +168,11 @@ def parse_pair(pair):
     if value[0] == value[-1] == '"':
         value = value[1:-1]
 
-    return key, value
+    return str(key).strip(), str(value).strip()
 
 
 def parse_key_value_list(header):
     return {
         key: value for key, value in
-        [parse_pair(header_pair) for header_pair in header.split(' ')]
+        [parse_pair(header_pair) for header_pair in header.split(',')]
     }

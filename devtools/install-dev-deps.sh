@@ -1,9 +1,7 @@
 #!/bin/bash
-pip install pytest
-pip install pytest-aiohttp
-pip install bumpversion
-pip install twine
-pip install mypy
 
-pip install pre-commit
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+pip install -r $SCRIPT_DIR/dev_requirements.txt
+
 pre-commit install
