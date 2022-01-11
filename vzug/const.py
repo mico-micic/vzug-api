@@ -1,4 +1,4 @@
-VERSION = '0.0.9'
+VERSION = '0.0.10'
 
 ENDPOINT_AI = 'ai'
 ENDPOINT_HH = 'hh'

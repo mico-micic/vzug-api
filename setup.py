@@ -8,7 +8,7 @@ with open(os.path.join(HERE, "README_PYPI.md"), encoding="utf-8") as readme:
 
 setup(
     name='vzug-api',
-    version='0.0.9',
+    version='0.0.10',
     description='Unofficial python API for V-ZUG devices',
     long_description=long_desc,
     long_description_content_type="text/markdown",
