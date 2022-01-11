@@ -1,5 +1,3 @@
-import json
-
 import re
 from typing import Dict, Any
 
@@ -12,6 +10,20 @@ locale.setlocale(locale.LC_ALL, '')  # Use '' for auto, or force e.g. to 'en_US.
 
 COMMAND_VALUE_ECOM_STAT_TOTAL = 'ecomXstatXtotal'
 COMMAND_VALUE_ECOM_STAT_AVG = 'ecomXstatXavarage'
+
+PROGRAM_NAME = 'name'
+PROGRAM_DURATION = 'duration'
+PROGRAM_DURATION_ACT = 'act'
+PROGRAM_STATUS = 'status'
+PROGRAM_STATUS_IDLE = 'idle'
+PROGRAM_OPTIDOS = 'optiDos'
+PROGRAM_OPTIDOS_SET = 'set'
+PROGRAM_OPTIDOS_DETERGENT_A_B = 'detergentAandB'
+PROGRAM_OPTIDOS_FILL_LEVEL_A = 'fillLevelA'
+PROGRAM_OPTIDOS_FILL_LEVEL_B = 'fillLevelB'
+PROGRAM_OPTIDOS_FILL_LEVEL_ACT = 'act'
+
+CONSUMPTION_DETAILS_VALUE = 'value'
 
 REGEX_MATCH_LITER = r"(\d+(?:[\,\.]\d+)?).?ℓ"
 REGEX_MATCH_KWH = r"(\d+(?:[\,\.]\d+)?).?kWh"
@@ -66,7 +78,7 @@ class WashingMachine(BasicDevice):
             program_json = (await self.make_vzug_device_call_json(
                 self.get_command_url(ENDPOINT_HH, COMMAND_GET_PROGRAM)))[0]
 
-            self._program_status = program_json['status']
+            self._program_status = program_json[PROGRAM_STATUS]
 
             # Load optiDos detailed information if optiDos is available / active
             # (optiDos may be available even if no program is active...)
@@ -76,12 +88,12 @@ class WashingMachine(BasicDevice):
             if opti_dos_only:
                 return True
 
-            if 'active' not in self._program_status:
+            if PROGRAM_STATUS_IDLE in self._program_status:
                 self._logger.info("No program information available because no program is active")
                 return False
 
-            self._program_name = program_json['name']
-            self._seconds_to_end = program_json['duration']['act']
+            self._program_name = program_json[PROGRAM_NAME]
+            self._seconds_to_end = program_json[PROGRAM_DURATION][PROGRAM_DURATION_ACT]
 
             self._logger.info("Go program information. Active program: %s, minutes to end: %.0f, end time: %s",
                               self.program_name, self.seconds_to_end / 60, self.date_time_end)
@@ -100,18 +112,18 @@ class WashingMachine(BasicDevice):
         self._optidos_a_status = ""
         self._optidos_b_status = ""
 
-        if 'fillLevelA' in program_json:
-            self._optidos_a_status = program_json['fillLevelA']['act']
+        if PROGRAM_OPTIDOS_FILL_LEVEL_A in program_json:
+            self._optidos_a_status = program_json[PROGRAM_OPTIDOS_FILL_LEVEL_A][PROGRAM_OPTIDOS_FILL_LEVEL_ACT]
 
-        if 'fillLevelB' in program_json:
-            self._optidos_b_status = program_json['fillLevelB']['act']
+        if PROGRAM_OPTIDOS_FILL_LEVEL_B in program_json:
+            self._optidos_b_status = program_json[PROGRAM_OPTIDOS_FILL_LEVEL_B][PROGRAM_OPTIDOS_FILL_LEVEL_ACT]
 
         self._optidos_active = False
-        if 'optiDos' in program_json:
-            self._optidos_config = program_json['optiDos']['set']
+        if PROGRAM_OPTIDOS in program_json:
+            self._optidos_config = program_json[PROGRAM_OPTIDOS][PROGRAM_OPTIDOS_SET]
 
             # TODO: Add support for other optiDos configurations
-            if self._optidos_config == "detergentAandB":
+            if self._optidos_config == PROGRAM_OPTIDOS_DETERGENT_A_B:
                 self._optidos_active = True
             else:
                 self._logger.info("Unknown optiDos configuration / status")
@@ -126,8 +138,8 @@ class WashingMachine(BasicDevice):
         url = self.get_command_url(ENDPOINT_HH, COMMAND_GET_COMMAND).update_query({'value': command})
         eco_json = await self.make_vzug_device_call_json(url)
 
-        if 'value' in eco_json:
-            return eco_json['value']
+        if CONSUMPTION_DETAILS_VALUE in eco_json:
+            return eco_json[CONSUMPTION_DETAILS_VALUE]
         else:
             self._logger.error('Error reading power and water consumption, no \'value\' entry found in response.')
             raise DeviceError('Got invalid response while reading power and water consumption data.', 'n/a')

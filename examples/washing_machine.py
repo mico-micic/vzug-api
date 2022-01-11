@@ -27,6 +27,7 @@ async def main():
     print("\n==== Current Program")
     if device.is_active:
         print("Program name:", device.program_name)
+        print("Program status:", device.program_status)
         print("End time:", device.date_time_end)
         print("Seconds to end:", device.seconds_to_end)
 
