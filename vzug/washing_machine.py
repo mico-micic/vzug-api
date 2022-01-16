@@ -133,27 +133,16 @@ class WashingMachine(BasicDevice):
         self._logger.info("optiDos information: %s optiDos A status: %s, optiDos B status: %s",
                           self._optidos_config, self.optidos_a_status, self.optidos_b_status)
 
-    async def _do_consumption_details_request(self, command: str) -> str:
-
-        url = self.get_command_url(ENDPOINT_HH, COMMAND_GET_COMMAND).update_query({'value': command})
-        eco_json = await self.make_vzug_device_call_json(url)
-
-        if CONSUMPTION_DETAILS_VALUE in eco_json:
-            return eco_json[CONSUMPTION_DETAILS_VALUE]
-        else:
-            self._logger.error('Error reading power and water consumption, no \'value\' entry found in response.')
-            raise DeviceError('Got invalid response while reading power and water consumption data.', 'n/a')
-
     async def load_consumption_data(self) -> bool:
         """Load power and water consumption data by calling the corresponding API endpoint"""
 
         self._logger.info("Loading power and water consumption data for %s", self._host)
         try:
-            consumption_total = await self._do_consumption_details_request(COMMAND_VALUE_ECOM_STAT_TOTAL)
+            consumption_total = await self.do_consumption_details_request(COMMAND_VALUE_ECOM_STAT_TOTAL)
             self._power_consumption_kwh_total = self._read_kwh_from_string(consumption_total)
             self._water_consumption_l_total = self._read_liter_from_string(consumption_total)
 
-            consumption_avg = await self._do_consumption_details_request(COMMAND_VALUE_ECOM_STAT_AVG)
+            consumption_avg = await self.do_consumption_details_request(COMMAND_VALUE_ECOM_STAT_AVG)
             self._power_consumption_kwh_avg = self._read_kwh_from_string(consumption_avg)
             self._water_consumption_l_avg = self._read_liter_from_string(consumption_avg)
 
