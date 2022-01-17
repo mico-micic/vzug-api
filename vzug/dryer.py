@@ -40,17 +40,11 @@ class Dryer(BasicDevice):
         if loaded:
             loaded = await self.load_consumption_data()
             
-            # TODO: Check if program data exists
-            #if loaded and self.is_active:
-            #    loaded = await self.load_program_details()
-            #else:
-                # If no program is active only load the optiDos data. (Use same function because the optiDos
-                # information is returned on the active program endpoint)
-                #loaded = await self.load_program_details(True)
-
+            if loaded and self.is_active:
+                loaded = await self.load_program_details()
+            
         return loaded
 
-    #TODO: check if program data can be loaded
     async def load_program_details(self) -> bool:
         """Load program details information by calling the corresponding API endpoint"""
 

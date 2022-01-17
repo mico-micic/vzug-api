@@ -1,0 +1,17 @@
+[
+  {
+    "id": 2500,
+    "name": "Extra dry",
+    "status": "active",
+    "duration": {
+      "set": 8100,
+      "act": 0
+    },
+    "allowedStatusChanges": {
+      "options": [
+        "idle",
+        "paused"
+       ]
+     }
+  }
+]
