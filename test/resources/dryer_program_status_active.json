@@ -5,7 +5,7 @@
     "status": "active",
     "duration": {
       "set": 8100,
-      "act": 0
+      "act": 3660
     },
     "allowedStatusChanges": {
       "options": [

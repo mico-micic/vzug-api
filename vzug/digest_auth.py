@@ -1,8 +1,9 @@
-from aiohttp import client_exceptions, hdrs
 import hashlib
-from yarl import URL
 import time
 import os
+
+from aiohttp import client_exceptions, hdrs
+from yarl import URL
 
 
 class DigestAuth:

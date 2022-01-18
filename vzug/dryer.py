@@ -1,12 +1,13 @@
-from .basic_device import BasicDevice, DeviceError
-from datetime import datetime, timedelta
-from .const import ENDPOINT_HH, COMMAND_GET_PROGRAM
 import locale
+
+from datetime import datetime, timedelta
+from .basic_device import BasicDevice, DeviceError, read_kwh_from_string
+from .const import ENDPOINT_HH, COMMAND_GET_PROGRAM
 
 locale.setlocale(locale.LC_ALL, '')  # Use '' for auto, or force e.g. to 'en_US.UTF-8'
 
-COMMAND_VALUE_ECOM_STAT_TOTAL = 'TotalXconsumptionXdrumDry'
-COMMAND_VALUE_ECOM_STAT_AVG = 'AverageXperXcycleXdrumDry'
+CMD_VALUE_CONSUMP_DRYER_TOTAL = 'TotalXconsumptionXdrumDry'
+CMD_VALUE_CONSUMP_DRYER_AVG = 'AverageXperXcycleXdrumDry'
 
 PROGRAM_NAME = 'name'
 PROGRAM_DURATION = 'duration'
@@ -81,11 +82,14 @@ class Dryer(BasicDevice):
 
         self._logger.info("Loading power consumption data for %s", self._host)
         try:
-            self._power_consumption_kwh_total = await self.do_consumption_details_request(COMMAND_VALUE_ECOM_STAT_TOTAL)
-            self._power_consumption_kwh_avg = await self.do_consumption_details_request(COMMAND_VALUE_ECOM_STAT_AVG)
+            consumption_total = await self.do_consumption_details_request(CMD_VALUE_CONSUMP_DRYER_TOTAL)
+            self._power_consumption_kwh_total = read_kwh_from_string(consumption_total)
+
+            consumption_avg = await self.do_consumption_details_request(CMD_VALUE_CONSUMP_DRYER_AVG)
+            self._power_consumption_kwh_avg = read_kwh_from_string(consumption_avg)
             
-            self._logger.info("Power consumption total: %s, avg: %s",
-                              self._power_consumption_kwh_total,
+            self._logger.info("Power consumption total: %s kWh, avg: %.1f kWh",
+                              locale.format_string('%.0f', self._power_consumption_kwh_total, True),
                               self._power_consumption_kwh_avg)
 
         except DeviceError as e:

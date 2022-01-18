@@ -1,11 +1,11 @@
 from tenacity import wait_none
-from vzug import const
-from vzug import BasicDevice, DEVICE_TYPE_WASHING_MACHINE
-from .util import get_test_response_from_file_raw
 from flask import Flask
 from flask import request
 from flask_testing import LiveServerTestCase
 from unittest import IsolatedAsyncioTestCase
+from vzug import const
+from vzug import BasicDevice, DEVICE_TYPE_WASHING_MACHINE
+from .util import get_test_response_from_file_raw
 
 # Disable retry wait time for better test performance
 BasicDevice.make_vzug_device_call_json.retry.wait = wait_none()
@@ -95,6 +95,3 @@ class TestInvalidResponse(LiveServerTestCase, IsolatedAsyncioTestCase):
         assert loaded is False
         assert device.error_code == "n/a"
         assert isinstance(device.error_exception is not None and device.error_exception.inner_exception, ValueError)
-
-
-

@@ -3,6 +3,7 @@ from flask import Flask
 from flask import request
 from flask_testing import LiveServerTestCase
 from unittest import IsolatedAsyncioTestCase
+from datetime import datetime
 from vzug import BasicDevice, WashingMachine, DeviceError, DEVICE_TYPE_WASHING_MACHINE
 from vzug.const import COMMAND_GET_COMMAND, COMMAND_GET_PROGRAM, COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC
 from vzug.washing_machine import COMMAND_VALUE_ECOM_STAT_TOTAL, COMMAND_VALUE_ECOM_STAT_AVG
@@ -92,6 +93,11 @@ class TestOkAndActiveProgramInformation(LiveServerTestCase, IsolatedAsyncioTestC
         assert active is True
         assert device.program_status == "active"
         assert device.program_name == "40°C Outdoor"
+
+        assert device.seconds_to_end == 2217
+        end = device.get_date_time_end().replace(microsecond=0)
+        assert (end-datetime.now().replace(microsecond=0)).total_seconds() == 2217
+
         assert device.optidos_active is True
         assert device.optidos_a_status == "ok"
         assert device.optidos_b_status == "ok"

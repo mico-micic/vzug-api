@@ -1,10 +1,9 @@
-import re
-from typing import Dict, Any
-
-from .basic_device import BasicDevice, DeviceError
-from datetime import datetime, timedelta
-from .const import ENDPOINT_HH, COMMAND_GET_PROGRAM, COMMAND_GET_COMMAND
 import locale
+
+from datetime import datetime, timedelta
+from typing import Dict, Any
+from .basic_device import BasicDevice, DeviceError, read_kwh_from_string, read_float_from_string
+from .const import ENDPOINT_HH, COMMAND_GET_PROGRAM
 
 locale.setlocale(locale.LC_ALL, '')  # Use '' for auto, or force e.g. to 'en_US.UTF-8'
 
@@ -26,7 +25,14 @@ PROGRAM_OPTIDOS_FILL_LEVEL_ACT = 'act'
 CONSUMPTION_DETAILS_VALUE = 'value'
 
 REGEX_MATCH_LITER = r"(\d+(?:[\,\.]\d+)?).?ℓ"
-REGEX_MATCH_KWH = r"(\d+(?:[\,\.]\d+)?).?kWh"
+
+
+def read_liter_from_string(consumption_value: str) -> float:
+    liter = read_float_from_string(consumption_value, REGEX_MATCH_LITER)
+    if liter < 0:
+        raise DeviceError('Cannot find liter value in string {0}'.format(consumption_value), 'n/a')
+
+    return liter
 
 
 class WashingMachine(BasicDevice):
@@ -139,12 +145,12 @@ class WashingMachine(BasicDevice):
         self._logger.info("Loading power and water consumption data for %s", self._host)
         try:
             consumption_total = await self.do_consumption_details_request(COMMAND_VALUE_ECOM_STAT_TOTAL)
-            self._power_consumption_kwh_total = self._read_kwh_from_string(consumption_total)
-            self._water_consumption_l_total = self._read_liter_from_string(consumption_total)
+            self._power_consumption_kwh_total = read_kwh_from_string(consumption_total)
+            self._water_consumption_l_total = read_liter_from_string(consumption_total)
 
             consumption_avg = await self.do_consumption_details_request(COMMAND_VALUE_ECOM_STAT_AVG)
-            self._power_consumption_kwh_avg = self._read_kwh_from_string(consumption_avg)
-            self._water_consumption_l_avg = self._read_liter_from_string(consumption_avg)
+            self._power_consumption_kwh_avg = read_kwh_from_string(consumption_avg)
+            self._water_consumption_l_avg = read_liter_from_string(consumption_avg)
 
             self._logger.info("Power consumption total: %s kWh, avg: %.1f kWh",
                               locale.format_string('%.0f', self._power_consumption_kwh_total, True),
@@ -161,28 +167,6 @@ class WashingMachine(BasicDevice):
             return False
 
         return True
-
-    @staticmethod
-    def _read_float_from_string(consumption_value: str, regex: str) -> float:
-        match = re.search(regex, consumption_value)
-        if match:
-            return float(match.group(1).replace(',', '.'))
-
-        return -1
-
-    def _read_liter_from_string(self, consumption_value: str) -> float:
-        liter = self._read_float_from_string(consumption_value, REGEX_MATCH_LITER)
-        if liter < 0:
-            raise DeviceError('Cannot find liter value in string {0}'.format(consumption_value), 'n/a')
-
-        return liter
-
-    def _read_kwh_from_string(self, consumption_value: str) -> float:
-        kwh = self._read_float_from_string(consumption_value, REGEX_MATCH_KWH)
-        if kwh < 0:
-            raise DeviceError('Cannot find kWh value in string {0}'.format(consumption_value), 'n/a')
-
-        return kwh
 
     @property
     def program_status(self) -> str:

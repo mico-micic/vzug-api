@@ -1,17 +1,18 @@
 from __future__ import annotations
 
-from distutils.util import strtobool
+import re
 import json
-from typing import Optional, Any, Dict
-
 import aiohttp
 import aiohttp.web
 import logging
-from .const import (COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC, ENDPOINT_AI, VERSION, DEVICE_TYPE_UNKNOWN,
-                    DEVICE_TYPE_WASHING_MACHINE, MODEL_MATCH_WASHING_MACHINE, ENDPOINT_HH, COMMAND_GET_COMMAND)
+
+from distutils.util import strtobool
+from typing import Optional, Any, Dict
 from yarl import URL
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type, before_log
-
+from .const import (COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC, ENDPOINT_AI, VERSION, DEVICE_TYPE_UNKNOWN,
+                    DEVICE_TYPE_WASHING_MACHINE, DEVICE_TYPE_DRYER, MODEL_MATCH_WASHING_MACHINE, MODEL_MATCH_DRYER,
+                    ENDPOINT_HH, COMMAND_GET_COMMAND)
 from .digest_auth import DigestAuth
 
 REQUEST_HEADERS = {
@@ -20,6 +21,24 @@ REQUEST_HEADERS = {
 }
 
 CONSUMPTION_DETAILS_VALUE = 'value'
+REGEX_MATCH_KWH = r"(\d+(?:[\,\.]\d+)?).?kWh"
+
+
+def read_kwh_from_string(value_str: str) -> float:
+    kwh = read_float_from_string(value_str, REGEX_MATCH_KWH)
+    if kwh < 0:
+        raise DeviceError('Cannot find kWh value in string {0}'.format(value_str), 'n/a')
+
+    return kwh
+
+
+def read_float_from_string(value_str: str, regex: str) -> float:
+    match = re.search(regex, value_str)
+    if match:
+        return float(match.group(1).replace(',', '.'))
+
+    return -1
+
 
 class DeviceAuthError(Exception):
     """Exception thrown if there is an authentication problem."""
@@ -180,6 +199,8 @@ class BasicDevice:
     def _set_device_type(self, device_model: str) -> None:
         if MODEL_MATCH_WASHING_MACHINE in device_model.lower():
             self._device_type = DEVICE_TYPE_WASHING_MACHINE
+        elif MODEL_MATCH_DRYER in device_model.lower():
+            self._device_type = DEVICE_TYPE_DRYER
         else:
             self._device_type = DEVICE_TYPE_UNKNOWN
 
@@ -191,9 +212,8 @@ class BasicDevice:
         if CONSUMPTION_DETAILS_VALUE in eco_json:
             return eco_json[CONSUMPTION_DETAILS_VALUE]
         else:
-            self._logger.error('Error reading power and water consumption, no \'value\' entry found in response.')
-            raise DeviceError('Got invalid response while reading power and water consumption data.', 'n/a')
-
+            self._logger.error('Error reading consumption data, no \'value\' entry found in response.')
+            raise DeviceError('Got invalid response while reading consumption data.', 'n/a')
 
     @property
     def serial(self) -> str:
