@@ -1,0 +1,6 @@
+{
+  "type": "status",
+  "description": "Total consumption",
+  "command": "TotalXconsumptionXdrumDry",
+  "value": "119 kWh"
+}

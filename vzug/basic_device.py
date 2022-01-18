@@ -8,7 +8,7 @@ import aiohttp
 import aiohttp.web
 import logging
 from .const import (COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC, ENDPOINT_AI, VERSION, DEVICE_TYPE_UNKNOWN,
-                    DEVICE_TYPE_WASHING_MACHINE, MODEL_MATCH_WASHING_MACHINE)
+                    DEVICE_TYPE_WASHING_MACHINE, MODEL_MATCH_WASHING_MACHINE, ENDPOINT_HH, COMMAND_GET_COMMAND)
 from yarl import URL
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type, before_log
 
@@ -19,6 +19,7 @@ REQUEST_HEADERS = {
     "Accept": f"application/json, text/plain, */*",
 }
 
+CONSUMPTION_DETAILS_VALUE = 'value'
 
 class DeviceAuthError(Exception):
     """Exception thrown if there is an authentication problem."""
@@ -181,6 +182,18 @@ class BasicDevice:
             self._device_type = DEVICE_TYPE_WASHING_MACHINE
         else:
             self._device_type = DEVICE_TYPE_UNKNOWN
+
+    async def do_consumption_details_request(self, command: str) -> str:
+
+        url = self.get_command_url(ENDPOINT_HH, COMMAND_GET_COMMAND).update_query({'value': command})
+        eco_json = await self.make_vzug_device_call_json(url)
+
+        if CONSUMPTION_DETAILS_VALUE in eco_json:
+            return eco_json[CONSUMPTION_DETAILS_VALUE]
+        else:
+            self._logger.error('Error reading power and water consumption, no \'value\' entry found in response.')
+            raise DeviceError('Got invalid response while reading power and water consumption data.', 'n/a')
+
 
     @property
     def serial(self) -> str:
