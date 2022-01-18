@@ -35,7 +35,8 @@ async def main():
 
     print("\n==== Power Consumption")
 
-    print(f"Power consumption total: {device.power_consumption_kwh_total}, avg: {device.power_consumption_kwh_avg}")
+    power_total = locale.format_string('%.0f', device.power_consumption_kwh_total, True)
+    print(f"Power consumption total: {power_total} kWh, avg: {device.power_consumption_kwh_avg:.1f} kWh")
 
 if __name__ == '__main__':
     asyncio.run(main())
