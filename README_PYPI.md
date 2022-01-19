@@ -10,10 +10,14 @@
 
 * Washing machines:
   * Get power and water consumption data.
-  * Get extended information for running program incl. optiDos status. 
+  * Get extended information for running program incl. optiDos status.
+
+* Dryers:
+  * Get power consumption data.
+  * Get extended information for running program. 
 
 ## Limitations and Warning
-Since I have only one V-ZUG machine (AdoraWash V4000), the library is not tested with other devices.
+Since we ([Darko Micic](https://github.com/dmicic) and me) have only two V-ZUG machines (AdoraWash and AdoraDry V4000), the library is not tested with other devices.
 
 ## How to use
 Check [examples (github.com)](https://github.com/mico-micic/vzug-api/tree/main/examples) directory for implementations.

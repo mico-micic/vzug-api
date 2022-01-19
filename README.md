@@ -12,8 +12,12 @@
   * Get power and water consumption data.
   * Get extended information for running program incl. optiDos status. 
 
+* Dryers:
+  * Get power consumption data.
+  * Get extended information for running program. 
+
 ## Limitations and Warning
-Since I have only one V-ZUG machine (AdoraWash V4000), the library is not tested with other devices.
+Since we ([Darko Micic](https://github.com/dmicic) and me) have only two V-ZUG machines (AdoraWash and AdoraDry V4000), the library is not tested with other devices.
 
 ## How to use
 Check example implementations in [examples/any_device.py](examples/any_device.py) and [examples/washing_machine.py](examples/washing_machine.py).
