@@ -8,3 +8,4 @@ flake8
 flask
 flask_httpauth
 Flask-Testing
+coverage
