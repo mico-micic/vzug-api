@@ -10,9 +10,9 @@ from distutils.util import strtobool
 from typing import Optional, Any, Dict
 from yarl import URL
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type, before_log
-from .const import (COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC, ENDPOINT_AI, VERSION, DEVICE_TYPE_UNKNOWN,
-                    DEVICE_TYPE_WASHING_MACHINE, DEVICE_TYPE_DRYER, MODEL_MATCH_WASHING_MACHINE, MODEL_MATCH_DRYER,
-                    ENDPOINT_HH, COMMAND_GET_COMMAND)
+from .const import (QUERY_PARAM_COMMAND, QUERY_PARAM_VALUE, COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC, ENDPOINT_AI,
+                    VERSION, DEVICE_TYPE_UNKNOWN, DEVICE_TYPE_WASHING_MACHINE, DEVICE_TYPE_DRYER,
+                    MODEL_MATCH_WASHING_MACHINE, MODEL_MATCH_DRYER, ENDPOINT_HH, COMMAND_GET_COMMAND)
 from .digest_auth import DigestAuth
 
 REQUEST_HEADERS = {
@@ -95,7 +95,7 @@ class BasicDevice:
         return URL.build(scheme='http', host=self._host.replace("http://", ""))
 
     def get_command_url(self, endpoint: str, command: str) -> URL:
-        return self.get_base_url().join(URL(endpoint)).update_query({'command': command})
+        return self.get_base_url().join(URL(endpoint)).update_query({QUERY_PARAM_COMMAND: command})
 
     async def make_vzug_device_call_raw(self, url: URL) -> str:
         """
@@ -109,9 +109,9 @@ class BasicDevice:
                 auth = DigestAuth(self._username, self._password, session, self._auth_previous)
                 resp = await auth.request('GET', url=url, headers=REQUEST_HEADERS)
                 self._auth_previous = {
-                  'nonce_count': auth.nonce_count,
-                  'last_nonce': auth.last_nonce,
-                  'challenge': auth.challenge,
+                    'nonce_count': auth.nonce_count,
+                    'last_nonce': auth.last_nonce,
+                    'challenge': auth.challenge,
                 }
 
                 if aiohttp.web.HTTPUnauthorized.status_code == resp.status:
@@ -206,7 +206,7 @@ class BasicDevice:
 
     async def do_consumption_details_request(self, command: str) -> str:
 
-        url = self.get_command_url(ENDPOINT_HH, COMMAND_GET_COMMAND).update_query({'value': command})
+        url = self.get_command_url(ENDPOINT_HH, COMMAND_GET_COMMAND).update_query({QUERY_PARAM_VALUE: command})
         eco_json = await self.make_vzug_device_call_json(url)
 
         if CONSUMPTION_DETAILS_VALUE in eco_json:

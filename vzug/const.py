@@ -2,6 +2,8 @@ VERSION = '0.1.0'
 
 ENDPOINT_AI = 'ai'
 ENDPOINT_HH = 'hh'
+QUERY_PARAM_COMMAND = 'command'
+QUERY_PARAM_VALUE = 'value'
 COMMAND_GET_STATUS = 'getDeviceStatus'
 COMMAND_GET_MODEL_DESC = 'getModelDescription'
 COMMAND_GET_PROGRAM = 'getProgram'

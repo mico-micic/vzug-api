@@ -1,0 +1,6 @@
+{
+  "type": "status",
+  "description": "Average per cycle",
+  "command": "AverageXperXcycleXdrumDry",
+  "value": "0.7 kWh"
+}

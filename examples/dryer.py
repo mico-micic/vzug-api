@@ -5,7 +5,7 @@ import locale
 
 locale.setlocale(locale.LC_ALL, '')  # Use '' for auto, or force e.g. to 'en_US.UTF-8'
 
-HOSTNAME_OR_IP = "192.168.1.6"
+HOSTNAME_OR_IP = "127.0.0.1:5000"
 USERNAME = ""
 PASSWORD = ""
 

@@ -1,0 +1,12 @@
+{
+  "DeviceName": "Virtual Dryer",
+  "Serial": "123-Virtual",
+  "Inactive": "false",
+  "Program": "TestProgram",
+  "Status": "Drying",
+  "ProgramEnd": {
+    "End": "",
+    "EndType": "0"
+  },
+  "deviceUuid": "test-uuid"
+}
