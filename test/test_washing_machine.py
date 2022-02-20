@@ -4,8 +4,8 @@ from flask import request
 from flask_testing import LiveServerTestCase
 from unittest import IsolatedAsyncioTestCase
 from datetime import datetime
-from vzug import BasicDevice, WashingMachine, DeviceError, DEVICE_TYPE_WASHING_MACHINE
-from vzug.const import COMMAND_GET_COMMAND, COMMAND_GET_PROGRAM, COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC
+from vzug import BasicDevice, WashingMachine, DeviceError
+from vzug import const
 from vzug.washing_machine import COMMAND_VALUE_ECOM_STAT_TOTAL, COMMAND_VALUE_ECOM_STAT_AVG
 from .util import get_test_response_from_file_raw
 
@@ -13,53 +13,55 @@ from .util import get_test_response_from_file_raw
 BasicDevice.make_vzug_device_call_json.retry.wait = wait_none()
 
 
-def server_status_ok_func():
+def server_ai_status_ok_func():
     cmd = request.args.get('command')
-    if cmd == COMMAND_GET_STATUS:
+    if cmd == const.COMMAND_GET_STATUS:
         return get_test_response_from_file_raw('device_status_ok_resp.json')
-    elif cmd == COMMAND_GET_MODEL_DESC:
+    elif cmd == const.COMMAND_GET_MODEL_DESC:
         return 'AdoraWash V4000'
     else:
         return 'WRONG REQUEST'
 
 
-def server_program_active_func():
-    if request.args.get('command') == COMMAND_GET_PROGRAM:
+def server_hh_program_active_func():
+    if request.args.get('command') == const.COMMAND_GET_PROGRAM:
         return get_test_response_from_file_raw('washing_machine_program_status_active.json')
     else:
-        return consumption_ok_handler_func()
+        return server_hh_default_func()
 
 
-def server_program_idle_func():
-    if request.args.get('command') == COMMAND_GET_PROGRAM:
+def server_hh_program_idle_func():
+    if request.args.get('command') == const.COMMAND_GET_PROGRAM:
         return get_test_response_from_file_raw('washing_machine_program_status_idle.json')
     else:
-        return 'WRONG REQUEST'
+        return server_hh_default_func()
 
 
-def consumption_ok_handler_func():
+def server_hh_default_func():
     cmd = request.args.get('command')
     value = request.args.get('value')
-    if cmd == COMMAND_GET_COMMAND and value == COMMAND_VALUE_ECOM_STAT_AVG:
+    if cmd == const.COMMAND_GET_COMMAND and value == COMMAND_VALUE_ECOM_STAT_AVG:
         return get_test_response_from_file_raw('washing_machine_consumption_avg.json')
-    elif cmd == COMMAND_GET_COMMAND and value == COMMAND_VALUE_ECOM_STAT_TOTAL:
+    elif cmd == const.COMMAND_GET_COMMAND and value == COMMAND_VALUE_ECOM_STAT_TOTAL:
         return get_test_response_from_file_raw('washing_machine_consumption_total.json')
+    elif cmd == const.COMMAND_GET_MACHINE_TYPE:
+        return const.DEVICE_TYPE_SHORT_WASHING_MACHINE
     else:
         return 'WRONG REQUEST'
 
 
-def create_app_with_func(func1, func2):
+def create_app_with_func(ai_func, hh_func):
     app = Flask(__name__)
     app.config['TESTING'] = True
-    app.route('/ai')(func1)
-    app.route('/hh')(func2)
+    app.route(f"/{const.ENDPOINT_AI}")(ai_func)
+    app.route(f"/{const.ENDPOINT_HH}")(hh_func)
     return app
 
 
 class TestOkAndActiveProgramInformation(LiveServerTestCase, IsolatedAsyncioTestCase):
 
     def create_app(self):
-        return create_app_with_func(server_status_ok_func, server_program_active_func)
+        return create_app_with_func(server_ai_status_ok_func, server_hh_program_active_func)
 
     async def test_all_information(self):
         device = WashingMachine(self.get_server_url())
@@ -73,7 +75,7 @@ class TestOkAndActiveProgramInformation(LiveServerTestCase, IsolatedAsyncioTestC
         assert device.uuid == "test-uuid"
         assert device.model_desc == "AdoraWash V4000"
         assert device.is_active is True
-        assert device.device_type is DEVICE_TYPE_WASHING_MACHINE
+        assert device.device_type is const.DEVICE_TYPE_WASHING_MACHINE
 
         assert device.program_status == "active"
         assert device.program_name == "40°C Outdoor"
@@ -114,7 +116,7 @@ class TestOkAndActiveProgramInformation(LiveServerTestCase, IsolatedAsyncioTestC
 class TestIdleProgramInformation(LiveServerTestCase, IsolatedAsyncioTestCase):
 
     def create_app(self):
-        return create_app_with_func(server_status_ok_func, server_program_idle_func)
+        return create_app_with_func(server_ai_status_ok_func, server_hh_program_idle_func)
 
     async def test_program_information_idle(self):
         device = WashingMachine(self.get_server_url())
@@ -131,7 +133,7 @@ class TestIdleProgramInformation(LiveServerTestCase, IsolatedAsyncioTestCase):
 class TestConsumptionInformation(LiveServerTestCase, IsolatedAsyncioTestCase):
 
     def create_app(self):
-        return create_app_with_func(server_status_ok_func, consumption_ok_handler_func)
+        return create_app_with_func(server_ai_status_ok_func, server_hh_default_func)
 
     async def test_consumption_information(self):
         device = WashingMachine(self.get_server_url())
@@ -147,7 +149,7 @@ class TestConsumptionInformation(LiveServerTestCase, IsolatedAsyncioTestCase):
 class TestConsumptionErrorInformation(LiveServerTestCase, IsolatedAsyncioTestCase):
 
     def create_app(self):
-        return create_app_with_func(server_status_ok_func,
+        return create_app_with_func(server_ai_status_ok_func,
                                     lambda: get_test_response_from_file_raw('washing_machine_consumption_err.json'))
 
     async def test_consumption_wrong_data(self):

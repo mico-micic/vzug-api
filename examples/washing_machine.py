@@ -19,6 +19,7 @@ async def main():
     await device.load_consumption_data()
 
     print("\n==== Device information")
+    print("Type:", device.device_type)
     print("Model:", device.model_desc)
     print("Name:", device.device_name)
     print("Status:", device.status)

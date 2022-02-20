@@ -10,9 +10,9 @@ from distutils.util import strtobool
 from typing import Optional, Any, Dict
 from yarl import URL
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type, before_log
-from .const import (QUERY_PARAM_COMMAND, QUERY_PARAM_VALUE, COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC, ENDPOINT_AI,
-                    VERSION, DEVICE_TYPE_UNKNOWN, DEVICE_TYPE_WASHING_MACHINE, DEVICE_TYPE_DRYER,
-                    MODEL_MATCH_WASHING_MACHINE, MODEL_MATCH_DRYER, ENDPOINT_HH, COMMAND_GET_COMMAND)
+from .const import (QUERY_PARAM_COMMAND, QUERY_PARAM_VALUE, COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC,
+                    COMMAND_GET_MACHINE_TYPE, ENDPOINT_AI, VERSION, DEVICE_TYPE_UNKNOWN, DEVICE_TYPE_MAPPING,
+                    ENDPOINT_HH, COMMAND_GET_COMMAND)
 from .digest_auth import DigestAuth
 
 REQUEST_HEADERS = {
@@ -87,7 +87,8 @@ class BasicDevice:
         self._uuid = ""
         self._active = False
         self._device_information_loaded = False
-        self._device_type = DEVICE_TYPE_UNKNOWN
+        self._device_type_short = ""
+        self._device_type: Optional[str] = DEVICE_TYPE_UNKNOWN
         self._logger = logging.getLogger(__name__)
         self._auth_previous: Dict[str, str] = {}
 
@@ -183,7 +184,11 @@ class BasicDevice:
             self._model_desc = await self.make_vzug_device_call_raw(
                 self.get_command_url(ENDPOINT_AI, COMMAND_GET_MODEL_DESC))
 
-            self._set_device_type(self._model_desc)
+            # Load short device type in separate call
+            self._device_type_short = await self.make_vzug_device_call_raw(
+                self.get_command_url(ENDPOINT_HH, COMMAND_GET_MACHINE_TYPE))
+
+            self._set_device_type()
             self._device_information_loaded = True
 
             self._logger.info("Got device information. Type: %s, model: %s, serial: %s, uuid: %s, name: %s, status: %s",
@@ -196,11 +201,9 @@ class BasicDevice:
             self._error_exception = e
             return False
 
-    def _set_device_type(self, device_model: str) -> None:
-        if MODEL_MATCH_WASHING_MACHINE in device_model.lower():
-            self._device_type = DEVICE_TYPE_WASHING_MACHINE
-        elif MODEL_MATCH_DRYER in device_model.lower():
-            self._device_type = DEVICE_TYPE_DRYER
+    def _set_device_type(self) -> None:
+        if self._device_type_short in DEVICE_TYPE_MAPPING:
+            self._device_type = DEVICE_TYPE_MAPPING.get(self._device_type_short)
         else:
             self._device_type = DEVICE_TYPE_UNKNOWN
 
@@ -260,7 +263,7 @@ class BasicDevice:
         return self._device_information_loaded
 
     @property
-    def device_type(self) -> str:
+    def device_type(self) -> Optional[str]:
         return self._device_type
 
     @property

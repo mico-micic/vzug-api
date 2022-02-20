@@ -11,7 +11,7 @@ from .util import get_test_response_from_file_raw
 BasicDevice.make_vzug_device_call_json.retry.wait = wait_none()
 
 
-def server_ok_func():
+def server_ai_ok_func():
     cmd = request.args.get('command')
     if cmd == const.COMMAND_GET_STATUS:
         return get_test_response_from_file_raw('device_status_ok_resp.json')
@@ -21,17 +21,27 @@ def server_ok_func():
         return 'WRONG REQUEST'
 
 
-def create_app_with_func(func):
+def server_hh_ok_func():
+    cmd = request.args.get('command')
+    if cmd == const.COMMAND_GET_MACHINE_TYPE:
+        return const.DEVICE_TYPE_SHORT_WASHING_MACHINE
+    else:
+        return 'WRONG REQUEST'
+
+
+def create_app_with_func(ai_func, hh_func):
     app = Flask(__name__)
     app.config['TESTING'] = True
-    app.route('/ai')(func)
+    app.route(f"/{const.ENDPOINT_AI}")(ai_func)
+    if hh_func is not None:
+        app.route(f"/{const.ENDPOINT_HH}")(hh_func)
     return app
 
 
 class TestOkResponse(LiveServerTestCase, IsolatedAsyncioTestCase):
 
     def create_app(self):
-        return create_app_with_func(server_ok_func)
+        return create_app_with_func(server_ai_ok_func, server_hh_ok_func)
 
     async def test_device_information_ok(self):
         device = BasicDevice(self.get_server_url())
@@ -65,7 +75,7 @@ class TestOkResponse(LiveServerTestCase, IsolatedAsyncioTestCase):
 class TestErrResponse(LiveServerTestCase, IsolatedAsyncioTestCase):
 
     def create_app(self):
-        return create_app_with_func(lambda: get_test_response_from_file_raw('device_status_error_resp.json'))
+        return create_app_with_func(lambda: get_test_response_from_file_raw('device_status_error_resp.json'), None)
 
     async def test_device_information_error(self):
         device = BasicDevice(self.get_server_url())
@@ -86,7 +96,7 @@ class TestErrResponse(LiveServerTestCase, IsolatedAsyncioTestCase):
 class TestInvalidResponse(LiveServerTestCase, IsolatedAsyncioTestCase):
 
     def create_app(self):
-        return create_app_with_func(lambda: 'no json response')
+        return create_app_with_func(lambda: 'no json response', None)
 
     async def test_device_information_invalid(self):
         device = BasicDevice(self.get_server_url())

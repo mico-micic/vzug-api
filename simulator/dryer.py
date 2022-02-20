@@ -1,7 +1,8 @@
 from flask import Flask, request, Response
 
 from vzug.const import (QUERY_PARAM_COMMAND, QUERY_PARAM_VALUE, COMMAND_GET_STATUS, COMMAND_GET_MODEL_DESC,
-                        COMMAND_GET_PROGRAM, ENDPOINT_AI, ENDPOINT_HH, COMMAND_GET_COMMAND)
+                        COMMAND_GET_PROGRAM, COMMAND_GET_MACHINE_TYPE, ENDPOINT_AI, ENDPOINT_HH, COMMAND_GET_COMMAND,
+                        DEVICE_TYPE_SHORT_DRYER)
 from util import get_response_from_file_raw
 
 app = Flask(__name__)
@@ -35,6 +36,8 @@ def get_program():
         return Response(get_response_from_file_raw("dryer_consumption_total.json"), mimetype='application/json')
     if COMMAND_GET_COMMAND in cmd and val in CMD_VALUE_CONSUMP_DRYER_AVG:
         return Response(get_response_from_file_raw("dryer_consumption_avg.json"), mimetype='application/json')
+    if cmd == COMMAND_GET_MACHINE_TYPE:
+        return DEVICE_TYPE_SHORT_DRYER
     else:
         return bad_request()
 
