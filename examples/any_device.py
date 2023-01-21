@@ -1,8 +1,10 @@
 import asyncio
 from vzug import BasicDevice
 import logconf
+import sys
 
-HOSTNAME_OR_IP = "192.168.0.202"
+# First parameter must be the device IP address
+HOSTNAME_OR_IP = sys.argv[1]
 USERNAME = ""
 PASSWORD = ""
 

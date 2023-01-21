@@ -6,7 +6,7 @@ import aiohttp
 import aiohttp.web
 import logging
 
-from distutils.util import strtobool
+from .util import strtobool
 from typing import Optional, Any, Dict
 from yarl import URL
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type, before_log

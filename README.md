@@ -31,6 +31,7 @@ To set up the development environment:
 1. Checkout this repository,
 2. Create virtual environment ([python venv](https://docs.python.org/3/library/venv.html)),
 3. Run [devtools/install-dev-deps.sh](devtools/install-dev-deps.sh) or (if you don't have bash) run the pip install lines from the [install-dev-deps.sh](devtools/install-dev-deps.sh) file manually.
+4. Run `pip install -e .` 
 
 ## How to add new device
 Feel free to contribute more devices by ...
