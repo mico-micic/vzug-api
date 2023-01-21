@@ -16,7 +16,7 @@
   * Get power consumption data.
   * Get extended information for running program. 
 
-* Dishwasher:
+* Dishwashers:
   * Get extended information for running / timed program. 
 
 ## Limitations and Warning
