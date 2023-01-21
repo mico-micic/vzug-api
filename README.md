@@ -16,6 +16,9 @@
   * Get power consumption data.
   * Get extended information for running program. 
 
+* Dishwasher:
+  * Get extended information for running / timed program. 
+
 ## Limitations and Warning
 Since we ([Darko Micic](https://github.com/dmicic) and me) have only two V-ZUG machines (AdoraWash and AdoraDry V4000), the library is not tested with other devices.
 
