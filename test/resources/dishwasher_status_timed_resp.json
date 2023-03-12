@@ -1,0 +1,12 @@
+{
+    "DeviceName": "",
+    "Serial": "nnnnn nnnnnn",
+    "Inactive": "false",
+    "Program": "Éco",
+    "Status": "Démarrage dans 1h52",
+    "ProgramEnd": {
+        "End": "8h02",
+        "EndType": "2"
+    },
+    "deviceUuid": "3657211"
+}

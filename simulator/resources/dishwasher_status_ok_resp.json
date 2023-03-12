@@ -1,0 +1,12 @@
+{
+    "DeviceName": "",
+    "Serial": "nnnnn nnnnnn",
+    "Inactive": "false",
+    "Program": "Éco",
+    "Status": "Nettoyage",
+    "ProgramEnd": {
+      "End": "5h49",
+      "EndType": "2"
+    },
+    "deviceUuid": "3657211"
+  }

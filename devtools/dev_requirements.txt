@@ -9,3 +9,5 @@ flask
 flask_httpauth
 Flask-Testing
 coverage
+tenacity
+flask

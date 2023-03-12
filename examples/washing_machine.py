@@ -2,10 +2,12 @@ import asyncio
 from vzug import WashingMachine
 import logconf
 import locale
+import sys
 
 locale.setlocale(locale.LC_ALL, '')  # Use '' for auto, or force e.g. to 'en_US.UTF-8'
 
-HOSTNAME_OR_IP = "192.168.0.202"
+# First parameter must be the device IP address
+HOSTNAME_OR_IP = sys.argv[1]
 USERNAME = ""
 PASSWORD = ""
 

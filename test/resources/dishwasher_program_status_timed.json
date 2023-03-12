@@ -1,0 +1,40 @@
+[
+    {
+        "id": 50,
+        "name": "Éco",
+        "status": "timed",
+        "starttime": {
+            "set": 6796,
+            "min": 0,
+            "max": 86400,
+            "step": 600
+        },
+        "duration": {
+            "set": 22200
+        },
+        "energySaving": {
+            "set": false
+        },
+        "optiStart": {
+            "set": true
+        },
+        "partialload": {
+            "set": false
+        },
+        "rinsePlus": {
+            "set": false
+        },
+        "dryPlus": {
+            "set": true
+        },
+        "stepIds": [
+            79,
+            81,
+            79,
+            78,
+            74,
+            72,
+            70
+        ]
+    }
+]

@@ -1,0 +1,35 @@
+[
+    {
+        "id": 50,
+        "name": "Éco",
+        "status": "active",
+        "duration": {
+            "act": 21024
+        },
+        "energySaving": {
+            "set": false
+        },
+        "optiStart": {
+            "set": true
+        },
+        "partialload": {
+            "set": false
+        },
+        "rinsePlus": {
+            "set": false
+        },
+        "dryPlus": {
+            "set": true
+        },
+        "activeStepIndex": 2,
+        "stepIds": [
+            79,
+            81,
+            79,
+            78,
+            74,
+            72,
+            70
+        ]
+    }
+]

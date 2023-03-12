@@ -16,6 +16,9 @@
   * Get power consumption data.
   * Get extended information for running program. 
 
+* Dishwashers:
+  * Get extended information for running / timed program. 
+
 ## Limitations and Warning
 Since we ([Darko Micic](https://github.com/dmicic) and me) have only two V-ZUG machines (AdoraWash and AdoraDry V4000), the library is not tested with other devices.
 
@@ -31,6 +34,7 @@ To set up the development environment:
 1. Checkout this repository,
 2. Create virtual environment ([python venv](https://docs.python.org/3/library/venv.html)),
 3. Run [devtools/install-dev-deps.sh](devtools/install-dev-deps.sh) or (if you don't have bash) run the pip install lines from the [install-dev-deps.sh](devtools/install-dev-deps.sh) file manually.
+4. Run `pip install -e .` 
 
 ## How to add new device
 Feel free to contribute more devices by ...

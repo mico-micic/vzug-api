@@ -1,5 +1,5 @@
 import asyncio
-from vzug import Dryer
+from vzug import Dishwasher
 import logconf
 import locale
 import sys
@@ -15,10 +15,9 @@ PASSWORD = ""
 async def main():
     logconf.setup_logging()
 
-    device = Dryer(HOSTNAME_OR_IP, USERNAME, PASSWORD)
+    device = Dishwasher(HOSTNAME_OR_IP, USERNAME, PASSWORD)
     await device.load_device_information()
     await device.load_program_details()
-    await device.load_consumption_data()
 
     print("\n==== Device information")
     print("Type:", device.device_type)
@@ -31,15 +30,21 @@ async def main():
     if device.is_active:
         print("Program name:", device.program_name)
         print("Program status:", device.program_status)
+
+        if device.program_status == 'timed':
+            print("Start time:", device.date_time_start)
+            print("Seconds to start:", device.seconds_to_start)
+
         print("End time:", device.date_time_end)
         print("Seconds to end:", device.seconds_to_end)
+
+        print("Energy saving:", device.is_energy_saving)
+        print("Opti start:", device.is_opti_start)
+        print("Partialload:", device.is_partialload)
+        print("Rinse plus:", device.is_rinse_plus)
+        print("Dry plus:", device.is_dry_plus)
     else:
         print("No program active")
-
-    print("\n==== Power Consumption")
-
-    power_total = locale.format_string('%.0f', device.power_consumption_kwh_total, True)
-    print(f"Power consumption total: {power_total} kWh, avg: {device.power_consumption_kwh_avg:.1f} kWh")
 
 if __name__ == '__main__':
     asyncio.run(main())
